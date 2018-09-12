@@ -4,8 +4,7 @@
   "description": "",
   "private": true,
   "scripts": {
-    "watch": "parcel ./index.html",
-    "build": "parcel build index.html --no-minify --public-url ./",
+    "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
