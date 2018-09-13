@@ -79,11 +79,11 @@ class Agent{
             target_f = tf.tensor2d(target_f, [1, this.actionSize])//.reshape([1,3])
             await this.model.fit(state, target_f, {
                 epochs: 1,
-                callbacks: {
-                    onBatchEnd: (batch, logs) => {
-                        console.log(logs.val_loss, logs.val_acc)
-                    }
-                }, verbose: true
+                // callbacks: {
+                //     onEpochEnd: (epoch, logs) => {
+                //         console.log(logs.loss, logs.acc)
+                //     }
+                // }
             })
             
             state.dispose()
