@@ -1,6 +1,9 @@
 const tf = require('@tensorflow/tfjs')
 const _ = require('lodash')
 
+// Load the binding:
+//require('@tensorflow/tfjs-node')
+
 class Agent{
     constructor(stateSize, is_eval = false, modelName = '') {
         this.stateSize = stateSize
@@ -42,7 +45,7 @@ class Agent{
             if(!this.eval && Math.random() <= this.epsilon){
                 return _.random(this.actionSize)
             }
-    
+
             state = tf.tensor(state).reshape([-1, this.stateSize])
             let options = this.model.predict(state).dataSync()
             // console.log(tf.argMax(options).dataSync()[0])
@@ -52,13 +55,16 @@ class Agent{
 
     async expReplay(batchSize) {
 
-        let miniBatch = []
-        let l = this.memory.length
+        //let miniBatch = []
+        /*let l = this.memory.length
         let range = _.range(l - batchSize + 1, l)
 
         for (let i = 0; i < range.length; i++) {
             miniBatch.push(this.memory[i])
-        }
+        }*/
+        const miniBatch = _.sampleSize(this.memory, batchSize)
+
+        //range.map(cur => miniBatch.push(cur))
 
         for (let j = 0; j < miniBatch.length; j++) {
             let [state, action, reward, next_state, done] = miniBatch[j]
@@ -79,13 +85,13 @@ class Agent{
             target_f = tf.tensor2d(target_f, [1, this.actionSize])//.reshape([1,3])
             await this.model.fit(state, target_f, {
                 epochs: 1,
-                // callbacks: {
-                //     onEpochEnd: (epoch, logs) => {
-                //         console.log(logs.loss, logs.acc)
-                //     }
-                // }
+                callbacks: {
+                    onEpochEnd: (epoch, logs) => {
+                        process.stdout.write(`${logs.loss} ${logs.acc}            \r`)
+                    }
+                }
             })
-            
+
             state.dispose()
             next_state.dispose()
             target_f.dispose()

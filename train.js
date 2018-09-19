@@ -8,7 +8,7 @@ console.log('Start script with: node --max-old-space-size=4096')
 if(args.length !== 5){
     console.log('Usage: node train [PAIR] [WINDOW] [EPISODES]')
     process.exit(-1)
-}    
+}
 
 let [pair_name, window_size, episode_count] = args.slice(2)
 window_size = +window_size
@@ -18,7 +18,7 @@ let agent = new Agent(window_size)
 let data = getData(pair_name)
 let l = data.length - 1
 let batch_size = 32
-const MAX_MEM = 5000
+const MAX_MEM = 2000
 
 const train = async () => {
 
@@ -38,7 +38,7 @@ const train = async () => {
 
             if(action == 1 && agent.inventory.length === 0) { //buy
                 agent.inventory.push(data[t])
-                // console.log('Buy: ' + data[t])
+                console.log(`Buy: ${data[t]} | Ep: ${e} | D: ${t}`)
             } else if(action == 2 && agent.inventory.length > 0) { //sell
                 let bought_price = agent.inventory.shift(0)
                 let _profit = data[t] - bought_price
@@ -47,14 +47,14 @@ const train = async () => {
                 total_profit += isNaN(_profit) ? 0 : _profit
                 total_trades++
                 // console.log(reward)
-                // console.log('Sell: ' + data[t] + ' | Profit: ' + _profit)
+                console.log(`Sell: ${data[t]} | Profit: ${ _profit}`)
             }
 
             let done = t == (l - 1)
 
             if(agent.memory.length > MAX_MEM) {
                 agent.memory.shift()
-            }        
+            }
             agent.memory.push([state, action, reward, next_state, done])
             // console.log(agent.memory.length)
             state = next_state
@@ -71,16 +71,10 @@ const train = async () => {
             }
         }
 
-        // if(e % 10 == 10){
-        //     agent.model.save('models/model_ep' + e)
-        // }
+        if(e % 10 == 10){
+            await agent.model.save('localstorage://models/model-ep' + e)
+        }
     }
-    return
+    console.log('Done')
 }
 train()
-console.log('Done')
-
-
-
-
-
