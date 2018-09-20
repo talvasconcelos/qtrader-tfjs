@@ -31,10 +31,10 @@ class Agent{
         }))
         model.add(tf.layers.dense({units: 32, activation: 'relu'}))
         model.add(tf.layers.dense({units: 8, activation: 'relu'}))
-        model.add(tf.layers.dense({units: this.actionSize, activation: 'linear'}))
+        model.add(tf.layers.dense({units: this.actionSize, activation: 'softmax'}))
         model.compile({
-            optimizer: tf.train.adam(0.000001),
-            loss: 'categoricalCrossentropy',
+            optimizer: tf.train.adam(0.0001),
+            loss: 'meanSquaredError',
             metrics: ['accuracy']
         })
 
@@ -49,7 +49,7 @@ class Agent{
 
             let _state = tf.tensor(state).reshape([-1, this.stateSize])
             let options = this.model.predict(_state)
-            options.print()
+            //options.print()
             return tf.argMax(options).dataSync()[0]
         })
     }
@@ -82,9 +82,12 @@ class Agent{
             X.push(state)
             Y.push(Array.from(target_f))
         })
-
+        //console.log(X.slice(0, 11))
         X = tf.tensor(X).reshape([-1, this.stateSize])
         Y = tf.tensor2d(Y)
+        
+        X.print()
+        this.model.predict(X).print()
 
         await this.model.fit(X, Y, {
             epochs: 1,
