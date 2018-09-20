@@ -4,7 +4,7 @@
   "description": "",
   "private": true,
   "dependencies": {
-    "@tensorflow/tfjs": "^0.12.7",
+    "@tensorflow/tfjs": "^0.13.0",
     "@tensorflow/tfjs-node": "^0.1.14",
     "lodash": "^4.17.10"
   },
