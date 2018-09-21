@@ -31,7 +31,7 @@ class Agent{
         }))
         model.add(tf.layers.dense({units: 32, activation: 'relu'}))
         model.add(tf.layers.dense({units: 8, activation: 'relu'}))
-        model.add(tf.layers.dense({units: this.actionSize, activation: 'softmax'}))
+        model.add(tf.layers.dense({units: this.actionSize, activation: 'linear'}))
         model.compile({
             optimizer: tf.train.adam(0.0001),
             loss: 'meanSquaredError',
@@ -86,21 +86,21 @@ class Agent{
         X = tf.tensor(X).reshape([-1, this.stateSize])
         Y = tf.tensor2d(Y)
         
-        X.print()
-        this.model.predict(X).print()
+        // X.print()
+        // this.model.predict(X).print()
 
         await this.model.fit(X, Y, {
             epochs: 1,
             batchSize,
-            // validationSplit: 0.15,
-            // shuffle: true,
+            validationSplit: 0.15,
+            shuffle: true,
             callbacks: {
                 // onBatchEnd: (batch, logs) => {
                 //     console.log(`${logs.loss} ${logs.acc}`)
                 // },
-                // onEpochEnd: (epoch, logs) => {
-                //     console.log(`${logs.val_loss} ${logs.val_acc}`)
-                // }
+                onEpochEnd: (epoch, logs) => {
+                    console.log(`${logs.val_loss} ${logs.val_acc}`)
+                }
             }
         })
         

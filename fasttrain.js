@@ -18,7 +18,7 @@ let agent = new Agent(window_size)
 let data = getData(pair_name)
 let l = data.length - 1
 let batch_size = 32
-const MAX_MEM = 1500
+const MAX_MEM = 5000
 
 const train = async () => {
 

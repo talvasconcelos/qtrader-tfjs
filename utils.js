@@ -2,11 +2,12 @@ const rawData = require('./dataset')
 const _ = require('lodash')
 
 const getData = () => {
-    return rawData.map(cur => +cur.close)
+    
+    return rawData.map(cur => +cur.close).filter(v => v)
 }
 
 const sigmoid = (x) => (1 / (1 + Math.exp(-x)))
-const tanh = (x) => ((Math.tanh(x) + 1) / 2) 
+//const tanh = (x) => ((Math.tanh(x) + 1) / 2) 
 
 const getState = (data, t, n) => {
     let d = t - n + 1
@@ -22,7 +23,7 @@ const getState = (data, t, n) => {
     let res = []
     for (let i = 0; i < n - 1; i++) {
         //let output = (block[i + 1] - block[i]) / block[i + 1]
-        res.push(tanh(block[i + 1] - block[i]))
+        res.push(sigmoid(block[i + 1] - block[i]))
         //res.push(output)
     }
     
