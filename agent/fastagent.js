@@ -33,7 +33,7 @@ class Agent{
         model.add(tf.layers.dense({units: 8, activation: 'relu'}))
         model.add(tf.layers.dense({units: this.actionSize, activation: 'linear'}))
         model.compile({
-            optimizer: tf.train.adam(0.0001),
+            optimizer: tf.train.adadelta(),
             loss: 'meanSquaredError',
             metrics: ['accuracy']
         })
@@ -92,7 +92,7 @@ class Agent{
         await this.model.fit(X, Y, {
             epochs: 1,
             batchSize,
-            validationSplit: 0.15,
+            validationSplit: 0.3,
             shuffle: true,
             callbacks: {
                 // onBatchEnd: (batch, logs) => {
@@ -104,7 +104,6 @@ class Agent{
             }
         })
         
-        //await this.model.predict(X).print()
 
         if (this.epsilon > this.epsilonMin) {
             this.epsilon *= this.epsilonDecay

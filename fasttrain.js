@@ -41,18 +41,18 @@ const train = async () => {
             if(action == 1 && agent.inventory.length === 0) { //buy
                 agent.inventory.push(data[t])
                 // console.log(`Buy: ${data[t]} | Ep: ${e} | D: ${t}`)
-            } else if(action == 2 && agent.inventory.length > 0) { //sell
+            } else if(action === 2 && agent.inventory.length > 0) { //sell
                 let bought_price = agent.inventory.shift(0)
                 let _profit = data[t] - bought_price
                 let pct = (_profit / bought_price)
-                reward = _profit <= 0 ? 0.01 : pct <= 0.1 ? pct : pct + 1//_.max([_profit, 0])
+                reward = _profit <= 0 ? 0 : pct <= 0.1 ? pct : pct + 1//_.max([_profit, 0])
                 total_profit += isNaN(_profit) ? 0 : _profit
                 total_trades++
                 // console.log(reward)
                 // console.log(`Sell: ${data[t]} | Profit: ${ _profit}`)
             }
 
-            let done = t == (l - 1)
+            let done = t === (l - 1)
 
             if(agent.memory.length > MAX_MEM - 1) {
                 agent.memory.shift()
@@ -69,10 +69,11 @@ const train = async () => {
 
         }
         await agent.expReplay(batch_size)
-        if(e % 10 == 10){
+        if(e % 10 == 0){
             await agent.model.save('localstorage://models/model-ep' + e)
         }
     }
     console.log('Done')
 }
+
 train()

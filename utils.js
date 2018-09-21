@@ -1,8 +1,7 @@
-const rawData = require('./dataset')
 const _ = require('lodash')
 
-const getData = () => {
-    
+const getData = (pair) => {
+    const rawData = require(`./datasets/${pair}.json`)
     return rawData.map(cur => +cur.close).filter(v => v)
 }
 
