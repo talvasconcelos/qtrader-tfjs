@@ -1,6 +1,9 @@
 const args = process.argv
+const tf = require('@tensorflow/tfjs')
 const _ = require('lodash')
 const {getData, getState} = require('./utils')
+
+require('@tensorflow/tfjs-node')
 
 const Agent = require('./agent/fastagent')
 console.log('Start script with: node --max-old-space-size=4096')
@@ -14,11 +17,12 @@ let [pair_name, modelName] = args.slice(2)
 
 // const model = tf.loadModel(`file://models/${modelName}`)
 // const window_size = model.layers[0].input.shape[1]
+/*const window_size = 6
 
-let agent = new Agent(null, true, modelName)
+let agent = new Agent(window_size, true, modelName)
 let data = getData(pair_name)
 let l = data.length - 1
-let window_size = agent.stateSize
+
 let batch_size = 32
 
 let state = getState(data, 0, window_size + 1)
@@ -60,19 +64,21 @@ for (let t = 0; t < l; t++) {
         console.log('Total Profit:', total_profit)
         console.log('--------------------------------')
     }
-}
+}*/
 
 const evaluate = async (eval_pair) => {
-    agent.eval = true
-    data = getData(eval_pair)
+    // const agent = new Agent(6, true, 'modelBH-4h')
+    // agent.model.summary()
+    
+    // const data = getData(eval_pair)
 
-    state = getState(data, 0, window_size + 1)
+    // state = getState(data, 0, window_size + 1)
         
-    total_profit = 0
-    agent.inventory = []
-    total_trades = 0
+    // total_profit = 0
+    // agent.inventory = []
+    // total_trades = 0
 
-    for (let t = 0; t < data.length - 1; t++) {
+    /*for (let t = 0; t < data.length - 1; t++) {
         let action = agent.action(state)
         
         //console.log(action)
@@ -109,7 +115,12 @@ const evaluate = async (eval_pair) => {
             console.log('--------------------------------')
         }
 
-    }
+    }*/
 }
 
+async function start() {
+    const model = await tf.loadModel(`file:///models/modelBH-4h.json`)
+    model.summary()
+}
+start()
 console.log('Evaluation Done')

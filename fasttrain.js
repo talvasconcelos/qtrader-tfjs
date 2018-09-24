@@ -73,9 +73,9 @@ const train = async () => {
 
         }
         await agent.expReplay(batch_size)
-        // if(e % 10 == 0){
-        //     await agent.model.save('file://models/model-ep' + e)
-        // }
+        if(e % 10 === 0 && e !== 0){
+            await agent.model.save('file://models/modelHP-ep' + e)
+        }
     }
     console.log('Done')
 }

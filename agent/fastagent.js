@@ -2,10 +2,11 @@ const tf = require('@tensorflow/tfjs')
 const _ = require('lodash')
 
 // Load the binding:
-//require('@tensorflow/tfjs-node')
+require('@tensorflow/tfjs-node')
 
 class Agent{
     constructor(stateSize, is_eval = false, modelName) {
+        this.stateSize = stateSize
         this.actionSize = 3
         this.memory = []
         this.inventory = []
@@ -17,8 +18,12 @@ class Agent{
         this.epsilonMin = 0.01
         this.epsilonDecay = 0.95
 
-        this.model = is_eval ? tf.loadModel('file://models/' + this.modelName) : this._model()
-        this.stateSize = is_eval ? this.model.layers[0].input.shape[1] : stateSize
+        this.model = is_eval ? this.loadModel(modelName) : this._model()
+    }
+
+    async loadModel(model) {
+        const loaded_model = await tf.loadModel('file://models/' + model)
+        return loaded_model
     }
 
     _model() {
