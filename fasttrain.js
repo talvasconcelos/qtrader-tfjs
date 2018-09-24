@@ -19,6 +19,7 @@ let data = getData(pair_name)
 let l = data.length - 1
 let batch_size = 32
 const MAX_MEM = 5000
+const buy_hold = (data[l] - data[0])
 
 const train = async () => {
 
@@ -36,17 +37,19 @@ const train = async () => {
             //console.log(action)
             //sit
             let next_state = getState(data, t + 1, window_size + 1)
-            let reward = 0
+            let reward = 0.25
 
             if(action == 1 && agent.inventory.length === 0) { //buy
+                reward += 0.25
                 agent.inventory.push(data[t])
                 // console.log(`Buy: ${data[t]} | Ep: ${e} | D: ${t}`)
             } else if(action === 2 && agent.inventory.length > 0) { //sell
                 let bought_price = agent.inventory.shift(0)
                 let _profit = data[t] - bought_price
                 let pct = (_profit / bought_price)
-                reward = _profit <= 0 ? 0 : pct <= 0.1 ? pct : pct + 1//_.max([_profit, 0])
+                reward = _profit <= 0 ? -1 : pct <= 0.1 ? 0.5 : 1 + pct//_.max([_profit, 0])
                 total_profit += isNaN(_profit) ? 0 : _profit
+                reward += total_profit > buy_hold ? 1 : -1
                 total_trades++
                 // console.log(reward)
                 // console.log(`Sell: ${data[t]} | Profit: ${ _profit}`)
@@ -64,14 +67,15 @@ const train = async () => {
             if(done) {
                 console.log('--------------------------------')
                 console.log('Total Profit:', total_profit.toFixed(2), 'Trades:', total_trades)
+                console.log('Vs Buy/Hold:', (total_profit - buy_hold).toFixed(2))
                 console.log('--------------------------------')
             }
 
         }
         await agent.expReplay(batch_size)
-        if(e % 10 == 0){
-            await agent.model.save('localstorage://models/model-ep' + e)
-        }
+        // if(e % 10 == 0){
+        //     await agent.model.save('file://models/model-ep' + e)
+        // }
     }
     console.log('Done')
 }

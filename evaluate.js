@@ -12,12 +12,13 @@ if(args.length !== 4){
 
 let [pair_name, modelName] = args.slice(2)
 
-// const model = tf.loadModel('')
-// const window_size = model.layers
+// const model = tf.loadModel(`file://models/${modelName}`)
+// const window_size = model.layers[0].input.shape[1]
 
-let agent = new Agent(window_size, true, modelName)
+let agent = new Agent(null, true, modelName)
 let data = getData(pair_name)
 let l = data.length - 1
+let window_size = agent.stateSize
 let batch_size = 32
 
 let state = getState(data, 0, window_size + 1)
@@ -30,7 +31,7 @@ for (let t = 0; t < l; t++) {
 
     //sit
     let next_state = getState(data, t + 1, window_size + 1)
-    let reward = 0
+    // let reward = 0
 
     if(action == 1 && agent.inventory.length === 0) { //buy
         agent.inventory.push(data[t])
@@ -38,8 +39,8 @@ for (let t = 0; t < l; t++) {
     } else if(action == 2 && agent.inventory.length > 0) { //sell
         let bought_price = agent.inventory.shift(0)
         let _profit = data[t] - bought_price
-        let pct = (_profit / bought_price)
-        reward = _profit <= 0 ? 0 : pct <= 0.1 ? pct * 10 : pct * 100//_.max([_profit, 0])
+        // let pct = (_profit / bought_price)
+        // reward = _profit <= 0 ? 0 : pct <= 0.1 ? pct * 10 : pct * 100//_.max([_profit, 0])
         total_profit += _profit
         // console.log(reward)
         // console.log('Sell: ' + data[t] + ' | Profit: ' + _profit)
@@ -47,10 +48,10 @@ for (let t = 0; t < l; t++) {
 
     let done = t == (l - 1)
 
-    if(agent.memory.length > MAX_MEM) {
-        agent.memory.shift()
-    }        
-    agent.memory.push([state, action, reward, next_state, done])
+    // if(agent.memory.length > MAX_MEM) {
+    //     agent.memory.shift()
+    // }        
+    // agent.memory.push([state, action, reward, next_state, done])
     // console.log(agent.memory.length)
     state = next_state
 

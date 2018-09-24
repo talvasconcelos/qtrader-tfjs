@@ -5,8 +5,7 @@ const _ = require('lodash')
 //require('@tensorflow/tfjs-node')
 
 class Agent{
-    constructor(stateSize, is_eval = false, modelName = '') {
-        this.stateSize = stateSize
+    constructor(stateSize, is_eval = false, modelName) {
         this.actionSize = 3
         this.memory = []
         this.inventory = []
@@ -16,22 +15,23 @@ class Agent{
         this.gamma = 0.95
         this.epsilon = 1.0
         this.epsilonMin = 0.01
-        this.epsilonDecay = 0.995
+        this.epsilonDecay = 0.95
 
-        this.model = is_eval ? tf.loadModel('models/' + modelName) : this._model()
+        this.model = is_eval ? tf.loadModel('file://models/' + this.modelName) : this._model()
+        this.stateSize = is_eval ? this.model.layers[0].input.shape[1] : stateSize
     }
 
     _model() {
         const model = tf.sequential()
         model.add(tf.layers.dense({
-            units: 64,
+            units: 32,
             inputShape: [this.stateSize],
             //inputDim:  this.stateSize,
-            activation: 'relu'
+            activation: 'elu'
         }))
-        model.add(tf.layers.dense({units: 32, activation: 'relu'}))
-        model.add(tf.layers.dense({units: 8, activation: 'relu'}))
-        model.add(tf.layers.dense({units: this.actionSize, activation: 'linear'}))
+        model.add(tf.layers.dense({units: 16, activation: 'elu'}))
+        model.add(tf.layers.dense({units: 8, activation: 'elu'}))
+        model.add(tf.layers.dense({units: this.actionSize, activation: 'softmax'}))
         model.compile({
             optimizer: tf.train.adadelta(),
             loss: 'meanSquaredError',
